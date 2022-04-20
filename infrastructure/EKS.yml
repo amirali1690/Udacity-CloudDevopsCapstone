@@ -1,2 +1,26 @@
-#test
-#
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+        Capstone Project--EKS template
+        Amirali Sabzehparvar
+
+Parameters:
+  EnvironmentName:
+    Description: An Environment name that will be prefixed to resources
+    Default: capstone-project
+    Type: String
+
+Resources:
+        Cluster:
+                Type: AWS::EKS::Cluster
+                Properties: 
+                        Version: "1.20"
+                        Name: !Sub ${EnvironmentName}-Cluster
+                        RoleArn: !GetAtt EKSClusterRole.ARN
+                        ResourcesVpcConfig:
+                                SecurityGroupIds:
+                                        - Fn::ImportValue: !Sub ${EnvironmentName}-SecurityGroup
+                                SubnetIds:
+                                        Fn::Split:
+                                                - ","
+                                                - Fn::ImportValue:
+                                                        Fn::Sub: ${EnvironmentName}-Public-Subnets

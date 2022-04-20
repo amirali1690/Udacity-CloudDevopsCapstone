@@ -1,0 +1,218 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+        EKS Cluster Network IaC
+        Amirali Sabzehparvar
+Parameters:
+  EnvironmentName:
+          Description: An Environment name that will be prefixed to resources
+          Default: capstone-project
+          Type: String
+
+  VPCCIDR:
+          Description: CIDR range for the VPC. The default is the default value of AWS.
+          Default: 10.0.0.0/16
+          Type: String
+
+  PublicSubnet1CIDR:
+          Description: CIDR range for the public subnet 1
+          Default: 10.0.0.0/24
+          Type: String
+  PublicSubnet2CIDR:
+          Description: CIDR range for the public subnet 2
+          Default: 10.0.1.0/24
+          Type: String
+
+  PrivateSubnet1CIDR:
+        Description: CIDR range for the private subnet 1
+        Type: String
+        Default: 10.0.2.0/24
+
+  PrivateSubnet2CIDR:
+        Description: CIDR range for the private subnet 1
+        Type: String
+        Default: 10.0.3.0/24
+
+Resources:
+        VPC:
+                Type: AWS::EC2::VPC
+                Properties:
+                        CidrBlock: !Ref VPCCIDR
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName}-VPC
+
+        InternetGateway:
+                Type: AWS::EC2::InternetGateway
+                Properties:
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName}-InternetGateway
+        InternetGatewayAttachment:
+                Type: AWS::EC2::VPCGatewayAttachment
+                Properties:
+                        InternetGatewayId: !Ref InternetGateway
+                        VpcId: !Ref VPC
+
+        SecurityGroup:
+                Type: AWS::EC2::SecurityGroup
+                Properties:
+                        GroupName: ClusterCommunication
+                        GroupDescription: Allows cluster communication
+                        VpcId: !Ref VPC
+                        SecurityGroupIngress:
+                                - IpProtocol: tcp
+                                  FromPort: 80
+                                  ToPort: 80
+       
+        PrivateSubnet1:
+                Type: AWS::EC2::Subnet
+                Properties:
+                        CidrBlock: !Ref PrivateSubnet1CIDR
+                        VpcId: !Ref VPC
+                        MapPublicIpOnLaunch: false
+                        AvailabilityZone: !Select [ 0, !GetAZs '' ]
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+
+
+
+        PrivateSubnet2:
+                Type: AWS::EC2::Subnet
+                Properties:
+                        CidrBlock: !Ref PrivateSubnet2CIDR
+                        VpcId: !Ref VPC
+                        MapPublicIpOnLaunch: false
+                        AvailabilityZone: !Select [ 1, !GetAZs '' ]
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
+        
+        PublicSubnet1:
+                Type: AWS::EC2::Subnet
+                Properties:
+                        CidrBlock: !Ref PublicSubnet1CIDR
+                        VpcId: !Ref VPC
+                        MapPublicIpOnLaunch: true
+                        AvailabilityZone: !Select [ 0, !GetAZs '' ]
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+
+        PublicSubnet2:
+                Type: AWS::EC2::Subnet
+                Properties:
+                        CidrBlock: !Ref PublicSubnet2CIDR
+                        VpcId: !Ref VPC
+                        MapPublicIpOnLaunch: true
+                        AvailabilityZone: !Select [ 2, !GetAZs '' ]
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
+        NatGateway1EIP:
+                Type: AWS::EC2::EIP
+                DependsOn: InternetGatewayAttachment
+                Properties:
+                        Domain: vpc
+
+        NatGateway2EIP:
+                Type: AWS::EC2::EIP
+                DependsOn: InternetGatewayAttachment
+                Properties:
+                        Domain: vpc
+
+        NatGateway1:
+                Type: AWS::EC2::NatGateway
+                Properties:
+                        AllocationId: !GetAtt NatGateway1EIP.AllocationId
+                        SubnetId: !Ref PublicSubnet1
+
+        NatGateway2:
+                Type: AWS::EC2::NatGateway
+                Properties:
+                        AllocationId: !GetAtt NatGateway2EIP.AllocationId
+                        SubnetId: !Ref PublicSubnet2
+        PublicRouteTable:
+                Type: AWS::EC2::RouteTable
+                Properties:
+                        VpcId: !Ref VPC
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName} Public Routes
+
+        PublicRoute:
+                Type: AWS::EC2::Route
+                DependsOn: InternetGatewayAttachment
+                Properties:
+                        RouteTableId: !Ref PublicRouteTable
+                        DestinationCidrBlock: 0.0.0.0/0
+                        GatewayId: !Ref InternetGateway
+
+        PublicSubnet1RouteTableAssociation:
+                Type: AWS::EC2::SubnetRouteTableAssociation
+                Properties:
+                        RouteTableId: !Ref PublicRouteTable
+                        SubnetId: !Ref PublicSubnet1
+
+        PublicSubnet2RouteTableAssociation:
+                Type: AWS::EC2::SubnetRouteTableAssociation
+                Properties:
+                        RouteTableId: !Ref PublicRouteTable
+                        SubnetId: !Ref PublicSubnet2
+
+
+        PrivateRouteTable1:
+                Type: AWS::EC2::RouteTable
+                Properties:
+                        VpcId: !Ref VPC
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName} Private Routes (AZ1)
+
+        DefaultPrivateRoute1:
+                Type: AWS::EC2::Route
+                Properties:
+                        RouteTableId: !Ref PrivateRouteTable1
+                        DestinationCidrBlock: 0.0.0.0/0
+                        NatGatewayId: !Ref NatGateway1
+
+        PrivateSubnet1RouteTableAssociation:
+                Type: AWS::EC2::SubnetRouteTableAssociation
+                Properties:
+                        RouteTableId: !Ref PrivateRouteTable1
+                        SubnetId: !Ref PrivateSubnet1
+
+        PrivateRouteTable2:
+                Type: AWS::EC2::RouteTable
+                Properties:
+                        VpcId: !Ref VPC
+                        Tags:
+                                - Key: Name
+                                  Value: !Sub ${EnvironmentName} Private Routes (AZ2)
+
+        DefaultPrivateRoute2:
+                Type: AWS::EC2::Route
+                Properties:
+                        RouteTableId: !Ref PrivateRouteTable2
+                        DestinationCidrBlock: 0.0.0.0/0
+                        NatGatewayId: !Ref NatGateway2
+
+        PrivateSubnet2RouteTableAssociation:
+                Type: AWS::EC2::SubnetRouteTableAssociation
+                Properties:
+                        RouteTableId: !Ref PrivateRouteTable2
+                        SubnetId: !Ref PrivateSubnet2
+
+
+
+Outputs:
+        VPC:
+                Description: EKS-VPC
+                Value: !Ref VPC
+                Export:
+                        Name: !Sub ${EnvironmentName}-VPC
+        SecurityGroup:
+                Value: !Ref SecurityGroup
+                Export:
+                        Name: !Sub ${EnvironmentName}-SecurityGroup
