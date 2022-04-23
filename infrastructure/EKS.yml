@@ -17,8 +17,9 @@ Resources:
                         Name: !Sub ${EnvironmentName}-Cluster
                         RoleArn: !GetAtt EKSClusterRole.ARN
                         ResourcesVpcConfig:
-                                SecurityGroupIds:
-                                        - Fn::ImportValue: !Sub ${EnvironmentName}-SecurityGroup
+                                SecurityGroupIds: 
+                                        Fn::ImportValue:
+                                                !Sub ${EnvironmentName}-SecurityGroup
                                 SubnetIds:
                                         Fn::Split:
                                                 - ","

@@ -218,6 +218,6 @@ Outputs:
                         Name: !Sub ${EnvironmentName}-SecurityGroup
         PubSubIds:
                 Description: Public Subnets in EKS-VPC
-                Value: !JOIN [",",[ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]
+                Value: !Join [",",[ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]
                 Export:
                         Name: !Sub ${EnvironmentName}-Public-Subnets
