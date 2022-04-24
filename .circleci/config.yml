@@ -20,6 +20,12 @@ jobs:
                   sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64
                   sudo chmod +x /bin/hadolint
                   sudo hadolint Dockerfile
+      - run:
+              name: lint app.py
+              command: |
+                      source .venv/bin/activate
+                      make lint
+                      
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
