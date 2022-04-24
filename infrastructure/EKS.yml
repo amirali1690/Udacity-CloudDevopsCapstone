@@ -10,18 +10,53 @@ Parameters:
     Type: String
 
 Resources:
+        ClusterRole:
+                Type: AWS::IAM::Role
+                Properties:
+                        RoleName: !Sub ${EnvironmentName}-Cluster-Role
+                        AssumeRolePolicyDocument:
+                                Version: "2012-10-17"
+                                Statement:
+                                        - Effect: Allow
+                                          Principal:
+                                                  Service:
+                                                          - eks.amazonaws.com
+                                          Action:
+                                                  - sts:AssumeRole
+                        ManagedPolicyArns:
+                                - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+                                - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+                                - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+
+        ClusterInstantProfile:
+                Type: AWS::IAM::InstanceProfile
+                Properties:
+                        InstanceProfileName: !Sub ${EnvironmentName}-Cluster-Profile
+                        Roles:
+                                - !Ref ClusterRole
         Cluster:
                 Type: AWS::EKS::Cluster
                 Properties: 
                         Version: "1.20"
                         Name: !Sub ${EnvironmentName}-Cluster
-                        RoleArn: !GetAtt EKSClusterRole.ARN
+                        RoleArn: !GetAtt ClusterRole.Arn
                         ResourcesVpcConfig:
                                 SecurityGroupIds: 
-                                        Fn::ImportValue:
-                                                !Sub ${EnvironmentName}-SecurityGroup
+                                        - Fn::ImportValue: !Sub ${EnvironmentName}-SecurityGroup
+
                                 SubnetIds:
                                         Fn::Split:
                                                 - ","
                                                 - Fn::ImportValue:
                                                         Fn::Sub: ${EnvironmentName}-Public-Subnets
+Outputs:
+        EKSID:
+                Description: Elastic Kubernetes Service ID
+                Value: !Ref Cluster
+                Export:
+                        Name: !Sub ${EnvironmentName}-Cluster
+        EKSRole:
+                Description: EKS Role
+                Value: !GetAtt ClusterRole.Arn
+                Export:
+                        Name: !Sub ${EnvironmentName}-Role
