@@ -24,6 +24,7 @@ jobs:
               name: lint app.py
               command: |
                       source .venv/bin/activate
+                      pip install pylint
                       make lint
                       
 # Invoke jobs via workflows
