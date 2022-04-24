@@ -25,6 +25,7 @@ jobs:
               command: |
                       source .venv/bin/activate
                       pip install pylint
+                      make install
                       make lint
                       
 # Invoke jobs via workflows
