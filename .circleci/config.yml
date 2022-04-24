@@ -33,8 +33,9 @@ jobs:
         steps:
                 - checkout
                 - run: |
-                        sudo apt install docker.io
-                  
+                         sudo apt-get update
+                         sudo apt-get install docker-ce docker-ce-cli containerd.io
+ 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
