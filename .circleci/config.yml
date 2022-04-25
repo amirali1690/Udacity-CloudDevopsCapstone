@@ -33,7 +33,7 @@ jobs:
         steps:
                 - checkout
                 - run: 
-                  name: Install docker
+                        name: Install docker
                         command: |
                          sudo apt-get update
                          sudo apt-get install docker-ce docker-ce-cli containerd.io
