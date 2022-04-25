@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . app.py /app/
 
-RUN python3 -m install --upgrade pip &&\
-    python3 install --no-cache-dir --trusted-host pypi.python.org --requirements requirements.txt
+RUN pip install --upgrade --no-cache-dir pip &&\
+    pip install --no-cache-dir --trusted-host pypi.python.org --requirements requirements.txt
 
 EXPOSE 80
 
