@@ -26,7 +26,7 @@ jobs:
                       pip install pylint
                       make install
                       make lint
-  docker-creation:
+  docker-create-upload:
         docker:
                 - image: cimg/python:3.8
         steps:
@@ -38,7 +38,15 @@ jobs:
                         command: |
                                 docker build . --tag $DOCKER_IMAGE_NAME:capstone
                                 docker image ls
- 
+                - run:
+                        name: Upload Docker to Docker.com
+                        command: |
+                                dockerpath=$DOCKER_USERNAME/capstone
+                                echo "Docker ID and Image: $dockerpath"
+                                docker tag $DOCKER_IMAGE_NAME:capstone $dockerpath
+                                docker login --username=$DOCKER_USERNAME --password=$DOKER_PASSWORD
+                                docker push $dockerpath 
+                                
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
