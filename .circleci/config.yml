@@ -44,7 +44,7 @@ jobs:
                                 dockerpath=$DOCKER_USERNAME/capstone
                                 echo "Docker ID and Image: $dockerpath"
                                 docker tag $DOCKER_IMAGE_NAME:capstone $dockerpath
-                                docker login --username=$DOCKER_USERNAME --password=$DOKER_PASSWORD
+                                docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD
                                 docker push $dockerpath 
                                 
 # Invoke jobs via workflows
