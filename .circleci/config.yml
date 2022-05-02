@@ -59,7 +59,7 @@ jobs:
                                   chmod +x ./kubectl
                                   mv ./kubectl /usr/local/bin/kubectl
                                   aws eks --region us-east-1 update-kubeconfig --name amirali1690-capstone-cluster 
-                                  kubectl apply -f /infrustructure/deployment.yml
+                                  kubectl apply -f ./infrastructure/deployment.yml
                                   kubectl get deployments
 
 
