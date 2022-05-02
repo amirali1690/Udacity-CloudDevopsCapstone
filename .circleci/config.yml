@@ -3,12 +3,19 @@
 version: 2.1
 
 orbs:
-  aws-cli: circleci/aws-cli@2.0.6
+  aws-cli: circleci/aws-cli@3.1.0
 
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
+  aws-cli-cred-setup:
+          executer: aws-cli/default
+          steps:
+                  - aws-cli/setup:
+                          aws-access-key-id: AWS_ACCESS_KEY
+                          aws-secret-access-key: AWS_SECRET_KEY
+                          aws-region: AWS_REGION
   lint:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
@@ -69,6 +76,10 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
+  aws-cli:
+          jobs:
+                  - aws-cli-cred-setup:
+                          context: aws
   workflow:
     jobs:
       - lint
