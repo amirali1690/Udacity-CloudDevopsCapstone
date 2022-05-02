@@ -46,6 +46,22 @@ jobs:
                                 docker tag $DOCKER_IMAGE_NAME:capstone $dockerpath
                                 docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD
                                 docker push $dockerpath 
+  deploy-to-EKS:
+          docker:
+                  - image: amazon/aws-cli
+          steps:
+                  - checkout
+                  - run:
+                          name: Install eksctl
+                          command: |
+                                  curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+                                  sudo mv /tmp/eksctl /usr/local/bin
+                   - run:
+                          name: update kubeconfig
+                          command: |
+                                  aws eks --region us-east-1 update-kubeconfig --name amirali1690-capstone-cluster
+
+
                                 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
