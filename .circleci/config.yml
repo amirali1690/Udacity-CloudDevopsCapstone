@@ -56,8 +56,6 @@ jobs:
           steps:
                   - checkout
                   - run:
-                          name: aws configure
-                  - run:
                           name: update kubeconfig
                           command: |
                                   aws configure list
