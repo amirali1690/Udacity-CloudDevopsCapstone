@@ -50,18 +50,13 @@ jobs:
                                 docker tag $DOCKER_IMAGE_NAME:capstone $dockerpath
                                 docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD
                                 docker push $dockerpath 
-  awssetup:
-          executer: aws-cli/default
-          steps:
-                  - aws-cli/setup:
-                          aws-access-key-id: AWS_ACCESS_KEY
-                          aws-secret-access-key: AWS_SECRET_KEY
-                          aws-region: AWS_REGION
   deploy-to-EKS:
           docker:
                   - image: amazon/aws-cli
           steps:
                   - checkout
+                  - run:
+                          name: aws configure
                   - run:
                           name: update kubeconfig
                           command: |
@@ -78,9 +73,7 @@ workflows:
     jobs:
       - lint
       - docker-create-upload
-      - awssetup:
-              context: aws
       - deploy-to-EKS:
-              requires: [aws-cli-cred]
+              requires: [awssetup]
          
 
