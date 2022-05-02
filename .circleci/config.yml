@@ -73,7 +73,6 @@ workflows:
     jobs:
       - lint
       - docker-create-upload
-      - deploy-to-EKS:
-              requires: [awssetup]
+      - deploy-to-EKS 
          
 
