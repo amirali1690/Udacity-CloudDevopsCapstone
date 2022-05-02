@@ -56,7 +56,7 @@ jobs:
                           command: |
                                   curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
                                   sudo mv /tmp/eksctl /usr/local/bin
-                   - run:
+                  - run:
                           name: update kubeconfig
                           command: |
                                   aws eks --region us-east-1 update-kubeconfig --name amirali1690-capstone-cluster
@@ -70,4 +70,4 @@ workflows:
     jobs:
       - lint
       - docker-create-upload
-
+      - deploy-to-EKS
