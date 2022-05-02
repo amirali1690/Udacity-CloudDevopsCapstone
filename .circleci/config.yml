@@ -54,6 +54,7 @@ jobs:
                   - run:
                           name: update kubeconfig
                           command: |
+                                  aws configservice describe-configuration-recorder-status
                                   aws eks --region us-east-1 update-kubeconfig --name amirali1690-capstone-cluster
 
 
