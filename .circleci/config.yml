@@ -54,7 +54,7 @@ jobs:
                   - run:
                           name: update kubeconfig
                           command: |
-                                  sudo yum install -y kubectl
+                                  yum install -y kubectl
                                   kubectl version 
 
 
