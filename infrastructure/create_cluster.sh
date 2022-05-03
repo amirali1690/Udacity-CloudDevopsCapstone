@@ -1,5 +1,5 @@
 eksctl create cluster \
---name amirali1690-capstone-cluster \
+--name amirali1690-capstone \
 --version 1.22 \
 --region us-east-1 \
 --zones us-east-1a,us-east-1b \
