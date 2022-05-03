@@ -72,7 +72,7 @@ jobs:
                 - checkout
                 - run :
                         command: |
-                                URL="a7ea32022f5fb4b3aaeab7a650972566-2025081306.us-east-1.elb.amazonaws.com"
+                                URL="a220f40f70b20428582dff01dc3c766b-1256325371.us-east-1.elb.amazonaws.com"
                                 if curl -v ${URL} |grep Hello
                                 then
                                         echo "deployment successful"
