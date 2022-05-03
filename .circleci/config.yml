@@ -63,6 +63,7 @@ jobs:
                           name: deploy 
                           command: |
                                   kubectl apply -f ./infrastructure/deployment.yml
+                                  sleep 30s
                                   kubectl get deployments
   test-load-balancer:
          docker: 
