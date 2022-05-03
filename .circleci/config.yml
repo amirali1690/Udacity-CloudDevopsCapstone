@@ -64,7 +64,7 @@ jobs:
                           command: |
                                   kubectl apply -f ./infrastructure/deployment.yml
                                   kubectl get deployments
- test-load-balancer:
+  test-load-balancer:
          docker: 
                 - image: cimg/python:3.8
          steps:
