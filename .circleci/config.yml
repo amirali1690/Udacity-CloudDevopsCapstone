@@ -78,7 +78,7 @@ jobs:
                                         exit 0
                                 else
                                         echo "deployment not successful"
-                        exit 1:
+                                        exit 1
                                 fi
   
                                 
