@@ -66,7 +66,7 @@ jobs:
                                   kubectl get deployments
   test-load-balancer:
          docker: 
-                - image: cimg/python:3.8
+                - image: cimg/base:2021.04
          steps:
                 - checkout
                 - run :
@@ -80,8 +80,7 @@ jobs:
                                         echo "deployment not successful"
                         exit 1:
                                 fi
-
-
+  
                                 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -90,7 +89,8 @@ workflows:
     jobs:
       - lint
       - docker-create-upload
-      - deploy-to-EKS 
+      - deploy-to-EKS:
+              requires: [docker-create-upload] 
       - test-load-balancer:
               requires: [deploy-to-EKS]   
 
